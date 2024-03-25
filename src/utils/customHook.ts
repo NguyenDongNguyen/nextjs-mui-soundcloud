@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import WaveSurfer from 'wavesurfer.js';
+import { WaveSurferOptions } from 'wavesurfer.js';
 
 export const useHasMounted = () => {
     const [hasMounted, setHasMounted] = useState<boolean>(false);
@@ -9,17 +11,30 @@ export const useHasMounted = () => {
     return hasMounted;
 };
 
-export const useScript = (url: string) => {
+// WaveSurfer hook
+export const useWavesurfer = (
+    containerRef: React.RefObject<HTMLDivElement>,
+    // định nghĩa type cho Options nhưng ko requied thuộc tính container
+    options: Omit<WaveSurferOptions, 'container'>
+) => {
+    const [wavesurfer, setWavesurfer] = useState<any>(null);
+
+    // Initialize wavesurfer when the container mounts
+    // or any of the props change
     useEffect(() => {
-        const script = document.createElement('script');
+        if (!containerRef.current) return;
 
-        script.src = url;
-        script.async = true;
+        const ws = WaveSurfer.create({
+            ...options,
+            container: containerRef.current,
+        });
 
-        document.body.appendChild(script);
+        setWavesurfer(ws);
 
         return () => {
-            document.body.removeChild(script);
+            ws.destroy();
         };
-    }, [url]);
+    }, [options, containerRef]);
+
+    return wavesurfer;
 };
