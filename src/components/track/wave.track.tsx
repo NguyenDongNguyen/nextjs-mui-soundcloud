@@ -9,6 +9,7 @@ const WaveTrack = () => {
     const fileName = searchParams.get('audio');
     const containerRef = useRef<HTMLDivElement>(null);
 
+    //dùng useMemo xử lý bug bị re-render nhìu lần làm thay đổi deps của useEffect
     const optionsMemo = useMemo(() => {
         return {
             waveColor: 'rgb(200, 0, 200)',
