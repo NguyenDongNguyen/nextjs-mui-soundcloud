@@ -17,7 +17,7 @@ export const useWavesurfer = (
     // định nghĩa type cho Options nhưng ko requied thuộc tính container
     options: Omit<WaveSurferOptions, 'container'>
 ) => {
-    const [wavesurfer, setWavesurfer] = useState<any>(null);
+    const [wavesurfer, setWavesurfer] = useState<WaveSurfer | null>(null);
 
     // Initialize wavesurfer when the container mounts
     // or any of the props change
