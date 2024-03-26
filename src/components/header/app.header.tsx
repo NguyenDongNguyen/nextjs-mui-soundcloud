@@ -20,6 +20,7 @@ import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -62,6 +63,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function AppHeader() {
+    const { data: session } = useSession();
+    console.log('🚀 ~ AppHeader ~ session:', session);
+
     const router = useRouter();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
@@ -136,11 +140,7 @@ export default function AppHeader() {
             onClose={handleMobileMenuClose}
         >
             <MenuItem>
-                <IconButton
-                    size="large"
-                    aria-label="show 4 new mails"
-                    color="inherit"
-                >
+                <IconButton size="large" aria-label="show 4 new mails" color="inherit">
                     <Badge badgeContent={4} color="error">
                         <MailIcon />
                     </Badge>
@@ -213,20 +213,18 @@ export default function AppHeader() {
                                 },
                             }}
                         >
-                            <Link href={'/playlist'}>Playlist</Link>
-                            <Link href={'/like'}>Likes</Link>
-                            <Link href={'/upload'}>Upload</Link>
-                            <Avatar onClick={handleProfileMenuOpen}>DN</Avatar>
-                            {/* <IconButton
-                                size="large"
-                                edge="end"
-                                aria-label="account of current user"
-                                aria-controls={menuId}
-                                aria-haspopup="true"
-                                color="inherit"
-                            >
-                                <AccountCircle />
-                            </IconButton> */}
+                            {session ? (
+                                <>
+                                    <Link href={'/playlist'}>Playlist</Link>
+                                    <Link href={'/like'}>Likes</Link>
+                                    <Link href={'/upload'}>Upload</Link>
+                                    <Avatar onClick={handleProfileMenuOpen}>DN</Avatar>
+                                </>
+                            ) : (
+                                <>
+                                    <Link href={'/api/auth/signin'}>Login</Link>
+                                </>
+                            )}
                         </Box>
                         <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
                             <IconButton
