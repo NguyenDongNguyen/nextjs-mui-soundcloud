@@ -5,10 +5,12 @@ import NextAuthWrapper from '@/lib/next.auth.wrapper';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <>
-            <AppHeader />
-            {children}
-            <AppFooter />
-        </>
+        <html lang="en">
+            <body>
+                <ThemeRegistry>
+                    <NextAuthWrapper>{children}</NextAuthWrapper>
+                </ThemeRegistry>
+            </body>
+        </html>
     );
 }
