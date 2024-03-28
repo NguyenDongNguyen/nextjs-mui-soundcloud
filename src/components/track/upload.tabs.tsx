@@ -1,12 +1,12 @@
 'use client';
-
-import { Container } from '@mui/material';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import * as React from 'react';
 import Step1 from './steps/step1';
+import Step2 from './steps/step2';
+import { Container } from '@mui/material';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -32,6 +32,10 @@ function CustomTabPanel(props: TabPanelProps) {
 
 const UploadTabs = () => {
     const [value, setValue] = React.useState(0);
+    const [trackUpload, setTrackUpload] = React.useState({
+        fileName: '',
+        percent: 0,
+    });
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -40,7 +44,7 @@ const UploadTabs = () => {
     return (
         <Container
             sx={{
-                marginTop: '100px',
+                marginTop: '50px',
                 border: '1px solid #ddd',
             }}
         >
@@ -51,18 +55,15 @@ const UploadTabs = () => {
                         onChange={handleChange}
                         aria-label="basic tabs example"
                     >
-                        <Tab label="TRACKS" />
-                        <Tab label="BASIC INFORMATION" />
+                        <Tab label="Tracks" />
+                        <Tab label="Basic information" />
                     </Tabs>
                 </Box>
                 <CustomTabPanel value={value} index={0}>
-                    <Step1 />
+                    <Step1 setValue={setValue} setTrackUpload={setTrackUpload} />
                 </CustomTabPanel>
                 <CustomTabPanel value={value} index={1}>
-                    Item Two
-                </CustomTabPanel>
-                <CustomTabPanel value={value} index={2}>
-                    Item Three
+                    <Step2 trackUpload={trackUpload} />
                 </CustomTabPanel>
             </Box>
         </Container>
