@@ -1,4 +1,5 @@
 'use client';
+import { useTrackContext } from '@/lib/track.wrapper';
 import { useHasMounted } from '@/utils/customHook';
 import { Container } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
@@ -11,9 +12,11 @@ const AppFooter = () => {
     // xử lý nếu pre-render ở server thì render ra fragment
     if (!hasMounted) return <></>; //fragment
 
-    console.log('>>> check backend url: ', process.env.NEXT_PUBLIC_BACKEND_URL);
+    const { currentTrack, setCurrentTrack } = useTrackContext() as ITrackContext;
+    console.log('🚀 ~ AppFooter ~ currentTrack:', currentTrack);
+
     return (
-        <div>
+        <div style={{ marginTop: 50 }}>
             <AppBar
                 position="fixed"
                 sx={{
@@ -22,8 +25,17 @@ const AppFooter = () => {
                     background: '#f2f2f2',
                 }}
             >
-                <Container sx={{ display: 'flex', gap: 10 }}>
+                <Container
+                    sx={{
+                        display: 'flex',
+                        gap: 10,
+                        '.rhap_main': {
+                            gap: '30px',
+                        },
+                    }}
+                >
                     <AudioPlayer
+                        layout="horizontal-reverse"
                         src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/tracks/hoidanit.mp3`}
                         volume={0.5}
                         style={{
