@@ -104,7 +104,7 @@ export default function AppHeader() {
         >
             <MenuItem onClick={handleMenuClose}>
                 <Link
-                    href={'/profile'}
+                    href={`/profile/${session?.user?._id}`}
                     style={{ color: 'unset', textDecoration: 'unset' }}
                 >
                     Profile
