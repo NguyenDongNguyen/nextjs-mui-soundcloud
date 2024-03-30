@@ -8,15 +8,21 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import './wave.scss';
 import { Tooltip } from '@mui/material';
+import { useTrackContext } from '@/lib/track.wrapper';
 
-const WaveTrack = () => {
+interface IProps {
+    track: ITrackTop | null;
+}
+
+const WaveTrack = (props: IProps) => {
+    const { track } = props;
     const searchParams = useSearchParams();
     const fileName = searchParams.get('audio');
     const containerRef = useRef<HTMLDivElement>(null);
     const hoverRef = useRef<HTMLDivElement>(null);
-
     const [time, setTime] = useState<string>('0:00');
     const [duration, setDuration] = useState<string>('0:00');
+    const { currentTrack, setCurrentTrack } = useTrackContext() as ITrackContext;
 
     const optionsMemo = useMemo((): Omit<WaveSurferOptions, 'container'> => {
         let gradient, progressGradient;
@@ -27,27 +33,13 @@ const WaveTrack = () => {
             gradient = ctx.createLinearGradient(0, 0, 0, canvas.height * 1.35);
             gradient.addColorStop(0, '#656666'); // Top color
             gradient.addColorStop((canvas.height * 0.7) / canvas.height, '#656666'); // Top color
-            gradient.addColorStop(
-                (canvas.height * 0.7 + 1) / canvas.height,
-                '#ffffff'
-            ); // White line
-            gradient.addColorStop(
-                (canvas.height * 0.7 + 2) / canvas.height,
-                '#ffffff'
-            ); // White line
-            gradient.addColorStop(
-                (canvas.height * 0.7 + 3) / canvas.height,
-                '#B1B1B1'
-            ); // Bottom color
+            gradient.addColorStop((canvas.height * 0.7 + 1) / canvas.height, '#ffffff'); // White line
+            gradient.addColorStop((canvas.height * 0.7 + 2) / canvas.height, '#ffffff'); // White line
+            gradient.addColorStop((canvas.height * 0.7 + 3) / canvas.height, '#B1B1B1'); // Bottom color
             gradient.addColorStop(1, '#B1B1B1'); // Bottom color
 
             // Define the progress gradient
-            progressGradient = ctx.createLinearGradient(
-                0,
-                0,
-                0,
-                canvas.height * 1.35
-            );
+            progressGradient = ctx.createLinearGradient(0, 0, 0, canvas.height * 1.35);
             progressGradient.addColorStop(0, '#EE772F'); // Top color
             progressGradient.addColorStop(
                 (canvas.height * 0.7) / canvas.height,
@@ -78,7 +70,6 @@ const WaveTrack = () => {
     }, []);
     const wavesurfer = useWavesurfer(containerRef, optionsMemo);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
-
     // Initialize wavesurfer when the container mounts
     // or any of the props change
     useEffect(() => {
@@ -155,6 +146,18 @@ const WaveTrack = () => {
         return `${percent}%`;
     };
 
+    // trong 1 time chỉ 1 track được chạy
+    useEffect(() => {
+        if (wavesurfer && currentTrack.isPlaying) {
+            wavesurfer.pause();
+        }
+    }, [currentTrack]);
+
+    useEffect(() => {
+        if (track?._id && !currentTrack?._id)
+            setCurrentTrack({ ...track, isPlaying: false });
+    }, [track]);
+
     return (
         <div style={{ marginTop: 20 }}>
             <div
@@ -180,7 +183,15 @@ const WaveTrack = () => {
                     <div className="info" style={{ display: 'flex' }}>
                         <div>
                             <div
-                                onClick={() => onPlayClick()}
+                                onClick={() => {
+                                    onPlayClick();
+                                    if (track && wavesurfer) {
+                                        setCurrentTrack({
+                                            ...currentTrack,
+                                            isPlaying: false,
+                                        });
+                                    }
+                                }}
                                 style={{
                                     borderRadius: '50%',
                                     background: '#f50',
@@ -193,9 +204,7 @@ const WaveTrack = () => {
                                 }}
                             >
                                 {isPlaying === true ? (
-                                    <PauseIcon
-                                        sx={{ fontSize: 30, color: 'white' }}
-                                    />
+                                    <PauseIcon sx={{ fontSize: 30, color: 'white' }} />
                                 ) : (
                                     <PlayArrowIcon
                                         sx={{ fontSize: 30, color: 'white' }}
@@ -213,7 +222,7 @@ const WaveTrack = () => {
                                     color: 'white',
                                 }}
                             >
-                                Hỏi Dân IT's song
+                                {track?.title}
                             </div>
                             <div
                                 style={{
@@ -225,7 +234,7 @@ const WaveTrack = () => {
                                     color: 'white',
                                 }}
                             >
-                                Eric
+                                {track?.description}
                             </div>
                         </div>
                     </div>
@@ -247,13 +256,11 @@ const WaveTrack = () => {
                         <div className="comments" style={{ position: 'relative' }}>
                             {arrComments.map((item) => {
                                 return (
-                                    <Tooltip title={item.content}>
+                                    <Tooltip title={item.content} arrow key={item.id}>
                                         <img
                                             onPointerMove={(e) => {
                                                 const hover = hoverRef.current!;
-                                                hover.style.width = calLeft(
-                                                    item.moment + 3
-                                                );
+                                                hover.style.width = calLeft(item.moment);
                                             }}
                                             key={item.id}
                                             style={{

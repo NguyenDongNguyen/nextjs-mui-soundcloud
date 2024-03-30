@@ -12,19 +12,32 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import { ListItem } from '@mui/material';
 import { useTrackContext } from '@/lib/track.wrapper';
+import { useState } from 'react';
+import PauseIcon from '@mui/icons-material/Pause';
+import Link from 'next/link';
 
 const ProfileTracks = (props: any) => {
     const { data } = props;
     const theme = useTheme();
     const { currentTrack, setCurrentTrack } = useTrackContext() as ITrackContext;
+    const [isPlay, setIsPlay] = useState(false);
+    console.log('🚀 ~ ProfileTracks ~ isPlay:', isPlay);
 
     return (
         <Card sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                 <CardContent sx={{ flex: '1 0 auto' }}>
-                    <Typography component="div" variant="h5">
-                        {data.title}
-                    </Typography>
+                    <Link
+                        style={{
+                            textDecoration: 'none',
+                            color: 'unset',
+                        }}
+                        href={`/track/${data._id}?audio=${data.trackUrl}&id=${data._id}`}
+                    >
+                        <Typography component="div" variant="h5">
+                            {data.title}
+                        </Typography>
+                    </Link>
                     <Typography
                         variant="subtitle1"
                         color="text.secondary"
@@ -41,17 +54,30 @@ const ProfileTracks = (props: any) => {
                             <SkipPreviousIcon />
                         )}
                     </IconButton>
-                    <IconButton
-                        aria-label="play/pause"
-                        onClick={() =>
-                            setCurrentTrack({
-                                ...data,
-                                isPlaying: false,
-                            })
-                        }
-                    >
-                        <PlayArrowIcon sx={{ height: 38, width: 38 }} />
-                    </IconButton>
+
+                    {(data._id !== currentTrack._id ||
+                        (data._id === currentTrack._id &&
+                            currentTrack.isPlaying === false)) && (
+                        <IconButton
+                            aria-label="play/pause"
+                            onClick={(e) => {
+                                setCurrentTrack({ ...data, isPlaying: true });
+                            }}
+                        >
+                            <PlayArrowIcon sx={{ height: 38, width: 38 }} />
+                        </IconButton>
+                    )}
+                    {data._id === currentTrack._id && currentTrack.isPlaying === true && (
+                        <IconButton
+                            aria-label="play/pause"
+                            onClick={(e) => {
+                                setCurrentTrack({ ...data, isPlaying: false });
+                            }}
+                        >
+                            <PauseIcon sx={{ height: 38, width: 38 }} />
+                        </IconButton>
+                    )}
+
                     <IconButton aria-label="next">
                         {theme.direction === 'rtl' ? (
                             <SkipPreviousIcon />
