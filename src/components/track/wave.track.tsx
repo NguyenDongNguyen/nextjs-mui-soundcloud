@@ -146,7 +146,6 @@ const WaveTrack = (props: IProps) => {
         return `${percent}%`;
     };
 
-    // trong 1 time chỉ 1 track được chạy
     useEffect(() => {
         if (wavesurfer && currentTrack.isPlaying) {
             wavesurfer.pause();
