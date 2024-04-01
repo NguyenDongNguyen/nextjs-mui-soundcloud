@@ -47,6 +47,7 @@ const AppFooter = () => {
                         }}
                     >
                         <Container
+                            disableGutters
                             sx={{
                                 display: 'flex',
                                 gap: 10,
@@ -80,13 +81,33 @@ const AppFooter = () => {
                                     flexDirection: 'column',
                                     alignItems: 'start',
                                     justifyContent: 'center',
-                                    minWidth: 100,
+                                    width: '220px',
                                 }}
                             >
-                                <div style={{ color: '#ccc' }}>
+                                <div
+                                    title={currentTrack.description}
+                                    style={{
+                                        width: '100%',
+                                        color: '#ccc',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
                                     {currentTrack.description}
                                 </div>
-                                <div style={{ color: 'black' }}>{currentTrack.title}</div>
+                                <div
+                                    title={currentTrack.title}
+                                    style={{
+                                        width: '100%',
+                                        color: 'black',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
+                                    {currentTrack.title}
+                                </div>
                             </div>
                         </Container>
                     </AppBar>
