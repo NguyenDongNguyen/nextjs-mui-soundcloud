@@ -9,13 +9,16 @@ import PauseIcon from '@mui/icons-material/Pause';
 import './wave.scss';
 import { Tooltip } from '@mui/material';
 import { useTrackContext } from '@/lib/track.wrapper';
+import { fetchDefaultImages } from '@/utils/api';
+import CommentTrack from './comment.track';
 
 interface IProps {
     track: ITrackTop | null;
+    comments: ITrackComment[];
 }
 
 const WaveTrack = (props: IProps) => {
-    const { track } = props;
+    const { track, comments } = props;
     const searchParams = useSearchParams();
     const fileName = searchParams.get('audio');
     const containerRef = useRef<HTMLDivElement>(null);
@@ -141,7 +144,7 @@ const WaveTrack = (props: IProps) => {
     ];
 
     const calLeft = (moment: number) => {
-        const hardCodeDuration = 199;
+        const hardCodeDuration = wavesurfer?.getDuration() ?? 0;
         const percent = (moment / hardCodeDuration) * 100;
         return `${percent}%`;
     };
@@ -253,15 +256,14 @@ const WaveTrack = (props: IProps) => {
                             }}
                         ></div>
                         <div className="comments" style={{ position: 'relative' }}>
-                            {arrComments.map((item) => {
+                            {comments.map((item) => {
                                 return (
-                                    <Tooltip title={item.content} arrow key={item.id}>
+                                    <Tooltip title={item.content} arrow key={item._id}>
                                         <img
                                             onPointerMove={(e) => {
                                                 const hover = hoverRef.current!;
                                                 hover.style.width = calLeft(item.moment);
                                             }}
-                                            key={item.id}
                                             style={{
                                                 height: 20,
                                                 width: 20,
@@ -270,7 +272,7 @@ const WaveTrack = (props: IProps) => {
                                                 zIndex: 20,
                                                 left: calLeft(item.moment),
                                             }}
-                                            src={`http://localhost:8000/images/chill1.png`}
+                                            src={fetchDefaultImages(item.user.type)}
                                         />
                                     </Tooltip>
                                 );
@@ -287,14 +289,26 @@ const WaveTrack = (props: IProps) => {
                         alignItems: 'center',
                     }}
                 >
-                    <div
-                        style={{
-                            background: '#ccc',
-                            width: 250,
-                            height: 250,
-                        }}
-                    ></div>
+                    {track?.imgUrl ? (
+                        <img
+                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/images/${track.imgUrl}`}
+                            height={250}
+                            width={250}
+                        />
+                    ) : (
+                        <div
+                            style={{
+                                background: '#ccc',
+                                width: 250,
+                                height: 250,
+                            }}
+                        ></div>
+                    )}
                 </div>
+            </div>
+
+            <div>
+                <CommentTrack comments={comments} track={track} wavesurfer={wavesurfer} />
             </div>
         </div>
     );
